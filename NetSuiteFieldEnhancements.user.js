@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including percentage rounding and adding currency symbols
-// @version      2.1
-// @match        https://*.app.netsuite.com/*
-// @exclude     https://*.app.netsuite.com/*&e=T
+// @version      2.11
+// @match        https://*.app.netsuite.com/app/accounting/transactions/*
+// @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
 // @require      http://code.jquery.com/jquery-latest.js
 // @author       Mike Linssen
@@ -98,14 +98,17 @@ jQuery(function($) {
     });
 
     //Change sublist percentage fields
-    tooltipValues = ["LIST PRICE DISCOUNT"];
+    tooltipValues = ["LIST PRICE DISCOUNT", "EST. GROSS PROFIT PERCENT"];
     querySelector = tooltipValues.map(function(value) {
     return 'td.listtexthl[data-ns-tooltip="' + value + '"], td.listtext[data-ns-tooltip="' + value + '"]';
     }).join(', ');
     tdElements = document.querySelectorAll(querySelector);
     tdElements.forEach(function(tdElement) {
-        var content = tdElement.textContent.trim();
-            tdElement.textContent = content + '%';
+        var content = parseFloat(tdElement.textContent.replace(',', '.').trim());
+        if (!isNaN(content)) {
+            var roundedContent = content.toFixed(1).replace('.', ',');
+            tdElement.textContent = roundedContent + '%';
+        }
     });
 
     function colorRows() {
