@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
-// @description  Netsuite field enhancements including percentage rounding and adding currency symbols
-// @version      2.12
+// @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
+// @version      2.20
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -50,11 +50,61 @@ jQuery(function($) {
     var querySelector = "";
 
     //Check for different currency
-    var currencySpan = document.querySelector('div[data-nsps-label="Currency"] span[data-nsps-type="field_input"]')
+    var currencySpan = document.querySelector('div[data-walkthrough="Field:currency"] span[data-nsps-type="field_input"]')
     if (currencySpan) {
         var spanContent = currencySpan.textContent.trim();
         if (spanContent === "British pound") {
             currency = "£ "
+        }
+    }
+
+    //Color credit limit
+    var creditBalanceSpan = document.querySelector('div[data-walkthrough="Field:balance"] span[data-nsps-type="field_input"]');
+    var creditLimitSpan = document.querySelector('div[data-walkthrough="Field:custbody_customer_credit_limit"] span[data-nsps-type="field_input"]');
+    if (creditBalanceSpan && creditLimitSpan) {
+        var creditBalanceContent = parseFloat(creditBalanceSpan.textContent.replace(',', '.').trim());
+        var creditLimitContent = parseFloat(creditLimitSpan.textContent.replace(',', '.').trim());
+        if (creditBalanceContent > creditLimitContent) {
+            creditBalanceSpan.style.setProperty('background-color', 'yellow');
+            creditBalanceSpan.style.setProperty('font-weight', 'bold');
+            creditBalanceSpan.style.setProperty('color', 'red', 'important');
+        }
+    }
+
+    //Color max refund
+    var maxRefundSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_refund_amount"] span[data-nsps-type="field_input"]');
+    if (maxRefundSpan) {
+        var maxRefundContent = parseFloat(maxRefundSpan.textContent.replace(',', '.').trim());
+        if (maxRefundContent > 0) {
+            maxRefundSpan.style.setProperty('background-color', 'yellow');
+            maxRefundSpan.style.setProperty('font-weight', 'bold');
+            maxRefundSpan.style.setProperty('color', 'red', 'important');
+        }
+    }
+
+    //Color max payment
+    var maxPaymentSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_pay_amount"] span[data-nsps-type="field_input"]');
+    if (maxPaymentSpan) {
+        var maxPaymentContent = parseFloat(maxPaymentSpan.textContent.replace(',', '.').trim());
+        if (maxPaymentContent > 0) {
+            maxPaymentSpan.style.setProperty('background-color', 'yellow');
+            maxPaymentSpan.style.setProperty('font-weight', 'bold');
+            maxPaymentSpan.style.setProperty('color', 'red', 'important');
+        }
+    }
+
+    //Color gross margin percent
+    var grossMarginSpan = document.querySelector('div[data-walkthrough="Field:estgrossprofitpercent"] span[data-nsps-type="field_input"]');
+    if (grossMarginSpan) {
+        var grossMarginContent = parseFloat(grossMarginSpan.textContent.replace(',', '.').trim());
+        if (grossMarginContent < 20) {
+            grossMarginSpan.style.setProperty('font-weight', 'bold');
+            grossMarginSpan.style.setProperty('color', 'red', 'important');
+        } else if (grossMarginContent < 30) {
+            grossMarginSpan.style.setProperty('font-weight', 'bold');
+            grossMarginSpan.style.setProperty('color', 'DarkOrange', 'important');
+        } else {
+            grossMarginSpan.style.setProperty('color', 'Green', 'important');
         }
     }
 
@@ -86,7 +136,7 @@ jQuery(function($) {
         prePaymentSpan.textContent = prePaymentContent + "%";
     }
 
-    //Change sublist currency fields
+    //Change specific sublist currency fields
     tooltipValues = ["LIST PRICE", "RATE", "AMOUNT", "TAX AMT", "GROSS AMT", "EST. EXTENDED COST", "EST. GROSS PROFIT", "PURCHASE PRICE"];
     querySelector = tooltipValues.map(function(value) {
     return 'td.listtexthl[data-ns-tooltip="' + value + '"], td.listtext[data-ns-tooltip="' + value + '"]';
@@ -97,7 +147,7 @@ jQuery(function($) {
             tdElement.textContent = currency + content;
     });
 
-    //Change sublist percentage fields
+    //Change specific sublist percentage fields
     tooltipValues = ["LIST PRICE DISCOUNT", "EST. GROSS PROFIT PERCENT"];
     querySelector = tooltipValues.map(function(value) {
     return 'td.listtexthl[data-ns-tooltip="' + value + '"], td.listtext[data-ns-tooltip="' + value + '"]';
@@ -112,22 +162,25 @@ jQuery(function($) {
     });
 
     function colorRows() {
-        //Color complete rows
+        //Color complete rows (sales order)
         var tdCommittedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="COMMITTED"], td.listtext[data-ns-tooltip="COMMITTED"]');
         tdCommittedCells.forEach(function(tdElement) {
-            var content = parseFloat(tdElement.textContent.replace(',', '.').trim());
+            var quantityCommitted = parseFloat(tdElement.textContent.replace(',', '.').trim());
                 var trElement = tdElement.closest('tr'); // Find the parent row (tr) element
                 if (trElement) {
                     var tdQty = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]'); // Find all td elements in the same row
-                        var content2 = parseFloat(tdQty.textContent.replace(',', '.').trim());
-                        var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
-                        tdElementsInRow.forEach(function(tdInRow) {
-                        if (content2 === content) {
-                            tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
-                        } else {
-                            tdInRow.style.setProperty('background-color', unavailableRowColor, 'important');
-                        }
-                        });
+                    var quantity = parseFloat(tdQty.textContent.replace(',', '.').trim());
+                    var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="FULFILLED"], td.listtext[data-ns-tooltip="FULFILLED"]'); // Find all td elements in the same row
+                    var quantityFulfilled = parseFloat(tdFul.textContent.replace(',', '.').trim());
+                    var quantityToFulfill = quantity - quantityFulfilled
+                    var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
+                    tdElementsInRow.forEach(function(tdInRow) {
+                    if (quantityToFulfill === quantityCommitted) {
+                        tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
+                    } else {
+                        tdInRow.style.setProperty('background-color', unavailableRowColor, 'important');
+                    }
+                    });
                 }
         });
 
