@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.20
+// @version      2.30
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -39,7 +39,8 @@ jQuery(function($) {
     var currency = "€ "; //Default currency
     var colorRowsEnabled = true; //Color rows by default
     var hideClosedEnabled = false; //Hide closed rows by default
-    var closedRowColor = 'Gainsboro';
+    var closedRowColor = 'LightGray';
+    var completedRowColor = 'Gainsboro';
     var availableRowcolor = '#c1f7c1';
     var unavailableRowColor = '#fcacac';
 
@@ -166,22 +167,50 @@ jQuery(function($) {
         var tdCommittedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="COMMITTED"], td.listtext[data-ns-tooltip="COMMITTED"]');
         tdCommittedCells.forEach(function(tdElement) {
             var quantityCommitted = parseFloat(tdElement.textContent.replace(',', '.').trim());
-                var trElement = tdElement.closest('tr'); // Find the parent row (tr) element
-                if (trElement) {
-                    var tdQty = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]'); // Find all td elements in the same row
-                    var quantity = parseFloat(tdQty.textContent.replace(',', '.').trim());
-                    var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="FULFILLED"], td.listtext[data-ns-tooltip="FULFILLED"]'); // Find all td elements in the same row
-                    var quantityFulfilled = parseFloat(tdFul.textContent.replace(',', '.').trim());
-                    var quantityToFulfill = quantity - quantityFulfilled
-                    var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
-                    tdElementsInRow.forEach(function(tdInRow) {
+            var trElement = tdElement.closest('tr'); // Find the parent row (tr) element
+            if (trElement) {
+                var tdQty = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
+                var quantity = parseFloat(tdQty.textContent.replace(',', '.').trim());
+                var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="FULFILLED"], td.listtext[data-ns-tooltip="FULFILLED"]');
+                var quantityFulfilled = parseFloat(tdFul.textContent.replace(',', '.').trim());
+                var quantityToFulfill = quantity - quantityFulfilled
+                var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
+                
+                tdElementsInRow.forEach(function(tdInRow) {
                     if (quantityToFulfill === quantityCommitted) {
+                        tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
+                    } else if (quantity === 0 || quantityToFulfill === 0) {
+                        tdInRow.style.setProperty('background-color', completedRowColor, 'important');
+                    } else {
+                        tdInRow.style.setProperty('background-color', unavailableRowColor, 'important');
+                    }
+                });
+            }
+        });
+
+        //Color confirmed cells (purchase order)
+        var tdConfirmedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="LINE CONFIRMED"], td.listtext[data-ns-tooltip="LINE CONFIRMED"]');
+        tdConfirmedCells.forEach(function(tdElement) {
+            var trElement = tdElement.closest('tr');
+            tdLineConfirmedContent = tdElement.textContent.trim();
+
+            if (trElement) {
+                var quantityField = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
+                var quantity = parseFloat(quantityField.textContent.replace(',', '.').trim());
+                var quantityReceivedField = trElement.querySelector('td.listtexthl[data-ns-tooltip="RECEIVED"], td.listtext[data-ns-tooltip="RECEIVED"]');
+                var quantityReceived = parseFloat(quantityReceivedField.textContent.replace(',', '.').trim());
+
+                var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
+                tdElementsInRow.forEach(function(tdInRow) {
+                    if (quantity === quantityReceived) {
+                        tdInRow.style.setProperty('background-color', completedRowColor, 'important');
+                    } else if (tdLineConfirmedContent.toLowerCase().includes('yes')) {
                         tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
                     } else {
                         tdInRow.style.setProperty('background-color', unavailableRowColor, 'important');
                     }
-                    });
-                }
+                });
+            }
         });
 
         //Color closed rows
