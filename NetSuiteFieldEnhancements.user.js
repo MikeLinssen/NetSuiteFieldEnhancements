@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.31
+// @version      2.32
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -135,7 +135,7 @@ jQuery(function($) {
     });
 
     //Change prePayment to add % sign
-    var prePaymentSpan = document.querySelector('div[data-nsps-label="Prepayment Percentage"] span[data-nsps-type="field_input"]')
+    var prePaymentSpan = document.querySelector('div[data-walkthrough="Field:custbody_prepayment_percentage"] span[data-nsps-type="field_input"]')
     if (prePaymentSpan) {
         var prePaymentContent = prePaymentSpan.textContent.trim();
         prePaymentSpan.textContent = prePaymentContent + "%";
