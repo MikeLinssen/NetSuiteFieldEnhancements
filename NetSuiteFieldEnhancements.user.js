@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.30
+// @version      2.31
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -63,8 +63,10 @@ jQuery(function($) {
     var creditBalanceSpan = document.querySelector('div[data-walkthrough="Field:balance"] span[data-nsps-type="field_input"]');
     var creditLimitSpan = document.querySelector('div[data-walkthrough="Field:custbody_customer_credit_limit"] span[data-nsps-type="field_input"]');
     if (creditBalanceSpan && creditLimitSpan) {
-        var creditBalanceContent = parseFloat(creditBalanceSpan.textContent.replace(',', '.').trim());
-        var creditLimitContent = parseFloat(creditLimitSpan.textContent.replace(',', '.').trim());
+        var creditBalanceContent = parseFloat(creditBalanceSpan.textContent.replace('.', '').replace(',', '.').trim());
+        var creditLimitContent = parseFloat(creditLimitSpan.textContent.replace('.', '').replace(',', '.').trim());
+        console.log(creditBalanceContent);
+        console.log(creditLimitContent);
         if (creditBalanceContent > creditLimitContent) {
             creditBalanceSpan.style.setProperty('background-color', 'yellow');
             creditBalanceSpan.style.setProperty('font-weight', 'bold');
@@ -75,7 +77,7 @@ jQuery(function($) {
     //Color max refund
     var maxRefundSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_refund_amount"] span[data-nsps-type="field_input"]');
     if (maxRefundSpan) {
-        var maxRefundContent = parseFloat(maxRefundSpan.textContent.replace(',', '.').trim());
+        var maxRefundContent = parseFloat(maxRefundSpan.textContent.replace('.', '').replace(',', '.').trim());
         if (maxRefundContent > 0) {
             maxRefundSpan.style.setProperty('background-color', 'yellow');
             maxRefundSpan.style.setProperty('font-weight', 'bold');
@@ -86,8 +88,10 @@ jQuery(function($) {
     //Color max payment
     var maxPaymentSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_pay_amount"] span[data-nsps-type="field_input"]');
     if (maxPaymentSpan) {
-        var maxPaymentContent = parseFloat(maxPaymentSpan.textContent.replace(',', '.').trim());
-        if (maxPaymentContent > 0) {
+        var maxPaymentContent = parseFloat(maxPaymentSpan.textContent.replace('.', '').replace(',', '.').trim());
+        var paymentMethodSpan = document.querySelector('div[data-walkthrough="Field:terms"] span[data-nsps-type="field_input"]');
+        var paymentMethodContent = paymentMethodSpan.textContent;
+        if (maxPaymentContent > 0 && paymentMethodContent.toLowerCase().includes('vooruitbetaling')) {
             maxPaymentSpan.style.setProperty('background-color', 'yellow');
             maxPaymentSpan.style.setProperty('font-weight', 'bold');
             maxPaymentSpan.style.setProperty('color', 'red', 'important');
@@ -97,7 +101,7 @@ jQuery(function($) {
     //Color gross margin percent
     var grossMarginSpan = document.querySelector('div[data-walkthrough="Field:estgrossprofitpercent"] span[data-nsps-type="field_input"]');
     if (grossMarginSpan) {
-        var grossMarginContent = parseFloat(grossMarginSpan.textContent.replace(',', '.').trim());
+        var grossMarginContent = parseFloat(grossMarginSpan.textContent.replace('.', '').replace(',', '.').trim());
         if (grossMarginContent < 20) {
             grossMarginSpan.style.setProperty('font-weight', 'bold');
             grossMarginSpan.style.setProperty('color', 'red', 'important');
@@ -113,7 +117,7 @@ jQuery(function($) {
     divElements = document.querySelectorAll('div[data-field-type="percent"]');
     divElements.forEach(function(divElement) {
         var spanElement = divElement.querySelector('span[data-nsps-type="field_input"]');
-        var spanContent = parseFloat(spanElement.textContent.replace(',', '.').trim());
+        var spanContent = parseFloat(spanElement.textContent.replace('.', '').replace(',', '.').trim());
         if (!isNaN(spanContent)) {
             var roundedSpanContent = spanContent.toFixed(1).replace('.', ',');
             spanElement.textContent = roundedSpanContent + '%';
@@ -155,7 +159,7 @@ jQuery(function($) {
     }).join(', ');
     tdElements = document.querySelectorAll(querySelector);
     tdElements.forEach(function(tdElement) {
-        var content = parseFloat(tdElement.textContent.replace(',', '.').trim());
+        var content = parseFloat(tdElement.textContent.replace('.', '').replace(',', '.').trim());
         if (!isNaN(content)) {
             var roundedContent = content.toFixed(1).replace('.', ',');
             tdElement.textContent = roundedContent + '%';
@@ -166,13 +170,13 @@ jQuery(function($) {
         //Color complete rows (sales order)
         var tdCommittedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="COMMITTED"], td.listtext[data-ns-tooltip="COMMITTED"]');
         tdCommittedCells.forEach(function(tdElement) {
-            var quantityCommitted = parseFloat(tdElement.textContent.replace(',', '.').trim());
+            var quantityCommitted = parseFloat(tdElement.textContent.replace('.', '').replace(',', '.').trim());
             var trElement = tdElement.closest('tr'); // Find the parent row (tr) element
             if (trElement) {
                 var tdQty = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
-                var quantity = parseFloat(tdQty.textContent.replace(',', '.').trim());
+                var quantity = parseFloat(tdQty.textContent.replace('.', '').replace(',', '.').trim());
                 var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="FULFILLED"], td.listtext[data-ns-tooltip="FULFILLED"]');
-                var quantityFulfilled = parseFloat(tdFul.textContent.replace(',', '.').trim());
+                var quantityFulfilled = parseFloat(tdFul.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityToFulfill = quantity - quantityFulfilled
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
                 
@@ -196,9 +200,9 @@ jQuery(function($) {
 
             if (trElement) {
                 var quantityField = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
-                var quantity = parseFloat(quantityField.textContent.replace(',', '.').trim());
+                var quantity = parseFloat(quantityField.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityReceivedField = trElement.querySelector('td.listtexthl[data-ns-tooltip="RECEIVED"], td.listtext[data-ns-tooltip="RECEIVED"]');
-                var quantityReceived = parseFloat(quantityReceivedField.textContent.replace(',', '.').trim());
+                var quantityReceived = parseFloat(quantityReceivedField.textContent.replace('.', '').replace(',', '.').trim());
 
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
                 tdElementsInRow.forEach(function(tdInRow) {
