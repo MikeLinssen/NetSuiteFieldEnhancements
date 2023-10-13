@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.32
+// @version      2.33
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -65,8 +65,6 @@ jQuery(function($) {
     if (creditBalanceSpan && creditLimitSpan) {
         var creditBalanceContent = parseFloat(creditBalanceSpan.textContent.replace('.', '').replace(',', '.').trim());
         var creditLimitContent = parseFloat(creditLimitSpan.textContent.replace('.', '').replace(',', '.').trim());
-        console.log(creditBalanceContent);
-        console.log(creditLimitContent);
         if (creditBalanceContent > creditLimitContent) {
             creditBalanceSpan.style.setProperty('background-color', 'yellow');
             creditBalanceSpan.style.setProperty('font-weight', 'bold');
@@ -183,6 +181,8 @@ jQuery(function($) {
                 tdElementsInRow.forEach(function(tdInRow) {
                     if (quantityToFulfill === quantityCommitted) {
                         tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
+                    } else if (isNaN(quantity)) {
+                        return
                     } else if (quantity === 0 || quantityToFulfill === 0) {
                         tdInRow.style.setProperty('background-color', completedRowColor, 'important');
                     } else {
