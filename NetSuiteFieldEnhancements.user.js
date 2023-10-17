@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.33
+// @version      2.34
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -42,6 +42,7 @@ jQuery(function($) {
     var closedRowColor = 'LightGray';
     var completedRowColor = 'Gainsboro';
     var availableRowcolor = '#c1f7c1';
+    var tempRowColor = '#ffd885';
     var unavailableRowColor = '#fcacac';
 
     //Define variables
@@ -175,17 +176,21 @@ jQuery(function($) {
                 var quantity = parseFloat(tdQty.textContent.replace('.', '').replace(',', '.').trim());
                 var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="FULFILLED"], td.listtext[data-ns-tooltip="FULFILLED"]');
                 var quantityFulfilled = parseFloat(tdFul.textContent.replace('.', '').replace(',', '.').trim());
+                var tdAvailable = trElement.querySelector('td.listtexthl[data-ns-tooltip="AVAILABLE"], td.listtext[data-ns-tooltip="AVAILABLE"]');
+                var quantityAvailable = parseFloat(tdAvailable.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityToFulfill = quantity - quantityFulfilled
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
                 
                 tdElementsInRow.forEach(function(tdInRow) {
-                    if (quantityToFulfill === quantityCommitted) {
+                    if (quantityToFulfill === quantityCommitted && quantityToFulfill != 0) {
                         tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
                     } else if (isNaN(quantity)) {
                         return
                     } else if (quantity === 0 || quantityToFulfill === 0) {
                         tdInRow.style.setProperty('background-color', completedRowColor, 'important');
-                    } else {
+                    } else if (quantityAvailable >= quantityToFulfill) {
+                        tdInRow.style.setProperty('background-color', tempRowColor, 'important');
+                    }else {
                         tdInRow.style.setProperty('background-color', unavailableRowColor, 'important');
                     }
                 });
