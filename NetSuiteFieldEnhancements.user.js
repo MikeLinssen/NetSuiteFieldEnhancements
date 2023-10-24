@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.34
+// @version      2.36
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -67,9 +67,7 @@ jQuery(function($) {
         var creditBalanceContent = parseFloat(creditBalanceSpan.textContent.replace('.', '').replace(',', '.').trim());
         var creditLimitContent = parseFloat(creditLimitSpan.textContent.replace('.', '').replace(',', '.').trim());
         if (creditBalanceContent > creditLimitContent) {
-            creditBalanceSpan.style.setProperty('background-color', 'yellow');
-            creditBalanceSpan.style.setProperty('font-weight', 'bold');
-            creditBalanceSpan.style.setProperty('color', 'red', 'important');
+            highlightField(creditBalanceSpan);
         }
     }
 
@@ -78,9 +76,7 @@ jQuery(function($) {
     if (maxRefundSpan) {
         var maxRefundContent = parseFloat(maxRefundSpan.textContent.replace('.', '').replace(',', '.').trim());
         if (maxRefundContent > 0) {
-            maxRefundSpan.style.setProperty('background-color', 'yellow');
-            maxRefundSpan.style.setProperty('font-weight', 'bold');
-            maxRefundSpan.style.setProperty('color', 'red', 'important');
+            highlightField(maxRefundSpan);
         }
     }
 
@@ -91,10 +87,24 @@ jQuery(function($) {
         var paymentMethodSpan = document.querySelector('div[data-walkthrough="Field:terms"] span[data-nsps-type="field_input"]');
         var paymentMethodContent = paymentMethodSpan.textContent;
         if (maxPaymentContent > 0 && paymentMethodContent.toLowerCase().includes('vooruitbetaling')) {
-            maxPaymentSpan.style.setProperty('background-color', 'yellow');
-            maxPaymentSpan.style.setProperty('font-weight', 'bold');
-            maxPaymentSpan.style.setProperty('color', 'red', 'important');
+            highlightField(maxPaymentSpan);
         }
+    }
+
+    //Color payment links
+    var paymentLinksSpan = document.querySelector('div[data-walkthrough="Field:custbody_pending_paylink_amount"] span[data-nsps-type="field_input"]');
+    if (paymentLinksSpan) {
+        var paymentLinksContent = parseFloat(paymentLinksSpan.textContent.replace('.', '').replace(',', '.').trim());
+        if (paymentLinksContent > 0) {
+            highlightField(paymentLinksSpan);
+        }
+    }
+
+    //Highlight field function
+    function highlightField(element) {
+            element.style.setProperty('background-color', 'yellow');
+            element.style.setProperty('font-weight', 'bold');
+            element.style.setProperty('color', 'red', 'important');
     }
 
     //Color gross margin percent
@@ -180,7 +190,7 @@ jQuery(function($) {
                 var quantityAvailable = parseFloat(tdAvailable.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityToFulfill = quantity - quantityFulfilled
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
-                
+
                 tdElementsInRow.forEach(function(tdInRow) {
                     if (quantityToFulfill === quantityCommitted && quantityToFulfill != 0) {
                         tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
@@ -201,7 +211,7 @@ jQuery(function($) {
         var tdConfirmedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="LINE CONFIRMED"], td.listtext[data-ns-tooltip="LINE CONFIRMED"]');
         tdConfirmedCells.forEach(function(tdElement) {
             var trElement = tdElement.closest('tr');
-            tdLineConfirmedContent = tdElement.textContent.trim();
+            var tdLineConfirmedContent = tdElement.textContent.trim();
 
             if (trElement) {
                 var quantityField = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
