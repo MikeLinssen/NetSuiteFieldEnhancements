@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.36
+// @version      2.40
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -50,6 +50,57 @@ jQuery(function($) {
     var tdElements = "";
     var tooltipValues = "";
     var querySelector = "";
+
+    //Set colors for statusses
+    const statusColors = {
+        "Accepted by Customer": "LightGreen",
+        "Allocation Check Needed": "PaleTurquoise",
+        "Automatic Credit (No Return Needed)": "DarkGray",
+        "Backorder": "IndianRed",
+        "Check Prices": "Tomato",
+        "Closed Won": "DarkKhaki",
+        "Confirmed": "Orange",
+        "Creating / In Progress": "PowderBlue",
+        "Customer Service Follow-up": "Fuchsia",
+        "Expired": "LightGray",
+        "Financial Audit": "Aquamarine",
+        "Followed Up": "Orange",
+        "Intercompany": "Aqua",
+        "Lost - Closed By Customer": "Violet",
+        "Lost - Closed By Econox": "Red",
+        "On Hold": "Silver",
+        "Open - Econox": "Red",
+        "Partially Received": "Plum",
+        "Pick & Pack": "DeepSkyBlue",
+        "Product Decision": "Plum",
+        "Quotation Sent": "Khaki",
+        "Released": "Yellow",
+        "Return approved": "Plum",
+        "Return back to customer": "Plum",
+        "Return Credited": "Plum",
+        "Return not approved": "Plum",
+        "Return Not OK": "Plum",
+        "Return OK": "Plum",
+        "Return received in warehouse": "Plum",
+        "Return registered": "Plum",
+        "Return technical evaluation": "Plum",
+        "Return to supplier": "Plum",
+        "Shipped": "DarkGray",
+        "Supply Chain Follow-up": "Plum",
+        "Technical Evaluation": "Plum",
+        "Wait For Payment": "MediumAquamarine",
+        "Waiting for shipment label": "Plum",
+        "Manually Closed": "Gray",
+        "Pending Approval": "MediumSpringGreen",
+        "In Order": "MediumPurple",
+        "Open": "Red",
+        "OCI Syntess": "Gainsboro",
+        "Ventilation advice report (IN PROGRESS)": "Blue",
+        "Ventilation advice report (UNTREATED)": "IndianRed",
+        "Supply Chain Review (BE)": "MediumTurquoise",
+        "Financial Credit Without Return": "LightGray",
+        "Check External Remark": "Gold"
+      };
 
     //Check for different currency
     var currencySpan = document.querySelector('div[data-walkthrough="Field:currency"] span[data-nsps-type="field_input"]')
@@ -175,6 +226,22 @@ jQuery(function($) {
         }
     });
 
+    var statusField = document.querySelector('div[data-walkthrough="Field:custbody_econox_order_status"] span[data-nsps-type="field_input"] span a');
+    var statusFieldSpan = document.querySelector('div[data-walkthrough="Field:custbody_econox_order_status"] span[data-nsps-type="field_input"]');
+    if (statusField && statusFieldSpan) {
+        var statusText = statusField.textContent;
+        console.log(statusText)
+        if (statusColors.hasOwnProperty(statusText)) {
+            var statusColor = statusColors[statusText];
+            console.log(statusColor);
+            statusFieldSpan.style.setProperty('background-color', statusColor, 'important');
+            statusFieldSpan.style.setProperty('padding', '5px', 'important');
+            statusField.style.setProperty('color', 'black', 'important');
+            statusField.style.setProperty('text-decoration', 'none', 'important');
+            statusField.removeAttribute('href');
+        };
+    };
+
     function colorRows() {
         //Color complete rows (sales order)
         var tdCommittedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="COMMITTED"], td.listtext[data-ns-tooltip="COMMITTED"]');
@@ -190,7 +257,7 @@ jQuery(function($) {
                 var quantityAvailable = parseFloat(tdAvailable.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityToFulfill = quantity - quantityFulfilled
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
-
+                
                 tdElementsInRow.forEach(function(tdInRow) {
                     if (quantityToFulfill === quantityCommitted && quantityToFulfill != 0) {
                         tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
@@ -297,5 +364,4 @@ if (colorRowsEnabled) {
 if (hideClosedEnabled) {
     hideClosed();
 };
-
 });
