@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.41
+// @version      2.42
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -86,12 +86,13 @@ jQuery(function($) {
         "Return technical evaluation": "Plum",
         "Return to supplier": "Plum",
         "Shipped": "DarkGray",
-        "Supply Chain Follow-up": "Plum",
+        "Supply Chain Follow-up": "LightSeaGreen",
         "Technical Evaluation": "Plum",
         "Wait For Payment": "MediumAquamarine",
         "Waiting for shipment label": "Plum",
         "Manually Closed": "Gray",
         "Pending Approval": "MediumSpringGreen",
+        "Pending Re-Approval": "MediumSpringGreen",
         "In Order": "MediumPurple",
         "Open": "Red",
         "OCI Syntess": "Gainsboro",
@@ -100,7 +101,6 @@ jQuery(function($) {
         "Supply Chain Review (BE)": "MediumTurquoise",
         "Financial Credit Without Return": "LightGray",
         "Check External Remark": "Gold",
-        "WTW Untreated": "IndianRed",
         "On-Hold Go-Live": "Pink"
       };
 
@@ -152,6 +152,15 @@ jQuery(function($) {
             highlightField(paymentLinksSpan);
         }
     }
+
+    //Color overdue balance
+    var overdueBalanceSpan = document.querySelector('div[data-walkthrough="Field:custbody_so_invoice_overdue"] span[data-nsps-type="field_input"]');
+    if (overdueBalanceSpan) {
+        var overdueBalanceContent = parseFloat(overdueBalanceSpan.textContent.replace('.', '').replace(',', '.').trim());
+        if (overdueBalanceContent > 0) {
+            highlightField(overdueBalanceSpan);
+        }
+    }    
 
     //Highlight field function
     function highlightField(element) {
@@ -259,7 +268,7 @@ jQuery(function($) {
                 var quantityAvailable = parseFloat(tdAvailable.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityToFulfill = quantity - quantityFulfilled
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
-                
+
                 tdElementsInRow.forEach(function(tdInRow) {
                     if (quantityToFulfill === quantityCommitted && quantityToFulfill != 0) {
                         tdInRow.style.setProperty('background-color', availableRowcolor, 'important');
