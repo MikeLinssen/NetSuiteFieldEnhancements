@@ -101,7 +101,8 @@ jQuery(function($) {
         "Supply Chain Review (BE)": "MediumTurquoise",
         "Financial Credit Without Return": "LightGray",
         "Check External Remark": "Gold",
-        "On-Hold Go-Live": "Pink"
+        "On-Hold Go-Live": "Pink",
+        "Tax Audit": "Coral"
       };
 
     //Check for different currency
