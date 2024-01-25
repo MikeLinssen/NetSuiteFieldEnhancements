@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.44
+// @version      2.45
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -51,7 +51,7 @@ jQuery(function($) {
     var tooltipValues = "";
     var querySelector = "";
 
-    //Set colors for statusses
+    //Set colors for statusses (See https://htmlcolorcodes.com/color-names/ for references)
     const statusColors = {
         "Accepted by Customer": "LightGreen",
         "Allocation Check Needed": "PaleTurquoise",
@@ -103,7 +103,8 @@ jQuery(function($) {
         "Check External Remark": "Gold",
         "On-Hold Go-Live": "Pink",
         "Tax Audit": "Coral",
-        "Financial Audit Rejected": "DarkSalmon"
+        "Financial Audit Rejected": "DarkSalmon",
+        "Pending Manual Invoice": "DarkOrchid"
       };
 
     //Check for different currency
