@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.45
+// @version      2.47
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -98,7 +98,7 @@ jQuery(function($) {
         "OCI Syntess": "Gainsboro",
         "Ventilation advice report (IN PROGRESS)": "Blue",
         "Ventilation advice report (UNTREATED)": "IndianRed",
-        "Supply Chain Review (BE)": "MediumTurquoise",
+        "Supply Chain Review": "MediumTurquoise",
         "Financial Credit Without Return": "LightGray",
         "Check External Remark": "Gold",
         "On-Hold Go-Live": "Pink",
