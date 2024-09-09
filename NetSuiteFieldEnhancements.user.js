@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.47
+// @version      2.48
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -112,7 +112,9 @@ jQuery(function($) {
     if (currencySpan) {
         var spanContent = currencySpan.textContent.trim();
         if (spanContent === "British pound") {
-            currency = "£ "
+            currency = "£ ";
+        } else if (spanContent === "Polish Zloty") {
+            currency = "zł ";
         }
     }
 
