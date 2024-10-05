@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.48
+// @version      2.49
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -165,7 +165,7 @@ jQuery(function($) {
         if (overdueBalanceContent > 0) {
             highlightField(overdueBalanceSpan);
         }
-    }    
+    }
 
     //Highlight field function
     function highlightField(element) {
@@ -218,18 +218,19 @@ jQuery(function($) {
     }
 
     //Change specific sublist currency fields
-    tooltipValues = ["LIST PRICE", "RATE", "AMOUNT", "TAX AMT", "GROSS AMT", "EST. EXTENDED COST", "EST. GROSS PROFIT", "PURCHASE PRICE"];
+    tooltipValues = ["List Price", "Rate", "Amount", "Tax Amt", "Gross Amt", "Est. Extended Cost", "Est. Gross Profit", "Purchase Price"];
     querySelector = tooltipValues.map(function(value) {
     return 'td.listtexthl[data-ns-tooltip="' + value + '"], td.listtext[data-ns-tooltip="' + value + '"]';
     }).join(', ');
     tdElements = document.querySelectorAll(querySelector);
     tdElements.forEach(function(tdElement) {
+        console.log(tdElement);
         var content = tdElement.textContent
             tdElement.textContent = currency + content;
     });
 
     //Change specific sublist percentage fields
-    tooltipValues = ["LIST PRICE DISCOUNT", "EST. GROSS PROFIT PERCENT"];
+    tooltipValues = ["List Price Discount", "Est. Gross Profit Percent"];
     querySelector = tooltipValues.map(function(value) {
     return 'td.listtexthl[data-ns-tooltip="' + value + '"], td.listtext[data-ns-tooltip="' + value + '"]';
     }).join(', ');
@@ -260,16 +261,16 @@ jQuery(function($) {
 
     function colorRows() {
         //Color complete rows (sales order)
-        var tdCommittedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="COMMITTED"], td.listtext[data-ns-tooltip="COMMITTED"]');
+        var tdCommittedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="Committed"], td.listtext[data-ns-tooltip="Committed"]');
         tdCommittedCells.forEach(function(tdElement) {
             var quantityCommitted = parseFloat(tdElement.textContent.replace('.', '').replace(',', '.').trim());
             var trElement = tdElement.closest('tr'); // Find the parent row (tr) element
             if (trElement) {
-                var tdQty = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
+                var tdQty = trElement.querySelector('td.listtexthl[data-ns-tooltip="Quantity"], td.listtext[data-ns-tooltip="Quantity"]');
                 var quantity = parseFloat(tdQty.textContent.replace('.', '').replace(',', '.').trim());
-                var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="FULFILLED"], td.listtext[data-ns-tooltip="FULFILLED"]');
+                var tdFul = trElement.querySelector('td.listtexthl[data-ns-tooltip="Fulfilled"], td.listtext[data-ns-tooltip="Fulfilled"]');
                 var quantityFulfilled = parseFloat(tdFul.textContent.replace('.', '').replace(',', '.').trim());
-                var tdAvailable = trElement.querySelector('td.listtexthl[data-ns-tooltip="AVAILABLE"], td.listtext[data-ns-tooltip="AVAILABLE"]');
+                var tdAvailable = trElement.querySelector('td.listtexthl[data-ns-tooltip="Available"], td.listtext[data-ns-tooltip="Available"]');
                 var quantityAvailable = parseFloat(tdAvailable.textContent.replace('.', '').replace(',', '.').trim());
                 var quantityToFulfill = quantity - quantityFulfilled
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
@@ -291,15 +292,15 @@ jQuery(function($) {
         });
 
         //Color confirmed cells (purchase order)
-        var tdConfirmedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="LINE CONFIRMED"], td.listtext[data-ns-tooltip="LINE CONFIRMED"]');
+        var tdConfirmedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="Line Confirmed"], td.listtext[data-ns-tooltip="Line Confirmed"]');
         tdConfirmedCells.forEach(function(tdElement) {
             var trElement = tdElement.closest('tr');
             var tdLineConfirmedContent = tdElement.textContent.trim();
 
             if (trElement) {
-                var quantityField = trElement.querySelector('td.listtexthl[data-ns-tooltip="QUANTITY"], td.listtext[data-ns-tooltip="QUANTITY"]');
+                var quantityField = trElement.querySelector('td.listtexthl[data-ns-tooltip="Quantity"], td.listtext[data-ns-tooltip="Quantity"]');
                 var quantity = parseFloat(quantityField.textContent.replace('.', '').replace(',', '.').trim());
-                var quantityReceivedField = trElement.querySelector('td.listtexthl[data-ns-tooltip="RECEIVED"], td.listtext[data-ns-tooltip="RECEIVED"]');
+                var quantityReceivedField = trElement.querySelector('td.listtexthl[data-ns-tooltip="Received"], td.listtext[data-ns-tooltip="Received"]');
                 var quantityReceived = parseFloat(quantityReceivedField.textContent.replace('.', '').replace(',', '.').trim());
 
                 var tdElementsInRow = trElement.querySelectorAll('td'); // Find all td elements in the same row
@@ -316,7 +317,7 @@ jQuery(function($) {
         });
 
         //Color closed rows
-        var tdClosedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="CLOSED"], td.listtext[data-ns-tooltip="CLOSED"]');
+        var tdClosedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="Closed"], td.listtext[data-ns-tooltip="Closed"]');
         tdClosedCells.forEach(function(tdElement) {
             var content = tdElement.textContent.trim();
             if (content.toLowerCase().includes('yes')) {
@@ -333,7 +334,7 @@ jQuery(function($) {
 
     function hideClosed() {
         //Hide closed rows
-        var tdClosedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="CLOSED"], td.listtext[data-ns-tooltip="CLOSED"]');
+        var tdClosedCells = document.querySelectorAll('td.listtexthl[data-ns-tooltip="Closed"], td.listtext[data-ns-tooltip="Closed"]');
         tdClosedCells.forEach(function(tdElement) {
             var content = tdElement.textContent.trim();
             if (content.toLowerCase().includes('yes')) {
