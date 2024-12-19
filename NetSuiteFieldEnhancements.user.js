@@ -142,6 +142,15 @@ jQuery(function($) {
         }
     }
 
+    //Color payment method
+    var paymentMethodSpan = document.querySelector('div[data-walkthrough="Field:custbody_cs_payment_term"] span[data-nsps-type="field_input"] span a');
+    if (paymentMethodSpan) {
+        var paymentMethodContent = paymentMethodSpan.textContent.trim();
+        if (paymentMethodContent == "Contante betaling") {
+            highlightField(paymentMethodSpan);
+        }
+    }
+
     //Color max payment
     var maxPaymentSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_pay_amount"] span[data-nsps-type="field_input"]');
     if (maxPaymentSpan) {
