@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.49
+// @version      2.50
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
