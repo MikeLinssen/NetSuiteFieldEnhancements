@@ -115,6 +115,10 @@ jQuery(function($) {
             currency = "£ ";
         } else if (spanContent === "Polish Zloty") {
             currency = "zł ";
+        } else if (spanContent === "Danish Krone") {
+            currency = "kr. ";
+        } else if (spanContent === "Swedish Krona") {
+            currency = "kr ";
         }
     }
 
