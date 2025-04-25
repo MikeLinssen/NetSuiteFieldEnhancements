@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netsuite field enhancements
 // @description  Netsuite field enhancements including row coloring, percentage rounding and adding currency symbols
-// @version      2.50
+// @version      2.51
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*?id=*
 // @exclude     https://*.app.netsuite.com/*&e=T*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=netsuite.com
@@ -149,16 +149,16 @@ jQuery(function($) {
         if (paymentMethodContent == "Contante betaling") {
             highlightField(paymentMethodSpan);
         }
-    }
 
-    //Color max payment
-    var maxPaymentSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_pay_amount"] span[data-nsps-type="field_input"]');
-    if (maxPaymentSpan) {
-        var maxPaymentContent = parseFloat(maxPaymentSpan.textContent.replace('.', '').replace(',', '.').trim());
-        var paymentMethodSpan = document.querySelector('div[data-walkthrough="Field:terms"] span[data-nsps-type="field_input"]');
-        var paymentMethodContent = paymentMethodSpan.textContent;
-        if (maxPaymentContent > 0 && paymentMethodContent.toLowerCase().includes('vooruitbetaling')) {
-            highlightField(maxPaymentSpan);
+        //Color max payment
+        var maxPaymentSpan = document.querySelector('div[data-walkthrough="Field:custbody_refpay_maximum_pay_amount"] span[data-nsps-type="field_input"]');
+        if (maxPaymentSpan) {
+            var maxPaymentContent = parseFloat(maxPaymentSpan.textContent.replace('.', '').replace(',', '.').trim());
+            var paymentMethodSpan = document.querySelector('div[data-walkthrough="Field:terms"] span[data-nsps-type="field_input"]');
+            var paymentMethodContent = paymentMethodSpan.textContent;
+            if (maxPaymentContent > 0 && paymentMethodContent.toLowerCase().includes('vooruitbetaling')) {
+                highlightField(maxPaymentSpan);
+            }
         }
     }
 
